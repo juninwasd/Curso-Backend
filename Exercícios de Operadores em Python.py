@@ -117,3 +117,16 @@ print ('Resultado pergunta 14.:',Variável)
 
 Verifique= (a is c)
 print ('Resultado pergunta 15.:',Verifique)
+
+#ou
+
+print(f"""    14. Verifique se (a is b):{a is b}
+    14. Verifiquese se (a is c):{a is c}""")
+
+print ("o valor é:", a)
+print ("o valor de A é:", a, "e o valor de B é", b)
+print (f"o valor de A é:{a} e o valor de B é:{b}")
+
+print ("""        podemos imprimir
+        multiplas linhas
+        na saída do print""")
