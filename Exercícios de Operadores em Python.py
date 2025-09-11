@@ -97,11 +97,11 @@ print ('Resultado pergunta 12.:',NOT)
 
 X = 10
 
-questão_1= (X + 5)
-print ('Parte 1.:',questão_1)
+X= (X + 5)
+print ('Parte 1.:',X)
 
-questão_2= (questão_1 * 2)
-print ('Parte 2.:',questão_2)
+X= (X * 2)
+print ('Parte 2.:',X)
 
-questão_3= (questão_2 - 4)
-print ('Parte Total.:',questão_3)
+X= (X - 4)
+print ('Parte Total.:',X)
