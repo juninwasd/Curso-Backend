@@ -105,3 +105,15 @@ print ('Parte 2.:',X)
 
 X= (X - 4)
 print ('Parte Total.:',X)
+
+#14 Crie duS Variáveis:
+
+a = [1,2,3]
+b = a
+c = [1,2,3]
+
+Variável= (a is b)
+print ('Resultado pergunta 14.:',Variável)
+
+Verifique= (a is c)
+print ('Resultado pergunta 15.:',Verifique)
