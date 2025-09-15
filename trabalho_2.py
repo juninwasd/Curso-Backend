@@ -5,12 +5,9 @@ while Contador <= 10:
     Contador +=1
 
 #
-for i in range (2,21,2):
+for i in range (2,22,2):
 
-    if i 
-        continue
-
-print (i)
+    print (i)
  #
 numero_1 =int(input("numero 1=") )
 numero_2 =int(input("numero 2=") )
@@ -25,9 +22,15 @@ print(soma)
 #
 for i in range(1,11):
  soma= (i*7)
- print ("Tabuada 7x{i}:",soma)
+ print (f"7 x {i} = {7 * i}")
 
 
 #
-for i in range(1,2):
- soma= (i*7)
+soma = 0
+while True:
+   numero = float(input("digite um número(0 para parar):" ))
+   if numero == 0:
+      break
+   soma += numero
+print ("A soma dos numeros é:", soma)
+   
