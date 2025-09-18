@@ -484,6 +484,76 @@ for contato,telefones in compromisso.items():
         print(f"  - {telefone}")
   
 
+def greet():
+    print('Hello words!')
+
+def saudacao(nome):
+    print(f"Olá, {nome}!")
+
+saudacao("Júnio")
+
+
+def soma(a,b):
+    return a + b
+resultado = soma(3, 5)
+print (resultado)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"""#
+
+agenda = []
+def adicionar():
+    compromisso = input("Digite o compromisso: ")
+    agenda.append(compromisso)
+    print("compromisso adicionado!\n")
+
+def ver_agenda():
+    print("\nAgenda atual: ")
+
+#"""
 
 
 
