@@ -14,3 +14,10 @@ def Ler_Pdf(caminho_arquivo):
     except PdfReadError:
         print("Erro ao ler o arquivo PDF.")
         return None
+
+caminho = input("Digite o caminho do arquivo PDF: ").strip('""')
+conteudo = Ler_Pdf(caminho)
+
+if conteudo:
+    print("Conteudo da primeira página: ")
+    print(conteudo)
