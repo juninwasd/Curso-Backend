@@ -105,20 +105,36 @@ produtob.descontos()
 print("Com desconto:"  ,produtob.get_preço())
 
 
-'''
+
 class Veiculo:
     def __init__(self,marca,ano):
         self.marca = marca
         self.ano = ano
     
-    def Carro(self,marca,ano):
+class Carro(Veiculo):
+    def mostrar_tipo(self):
+        print(f"{self.marca} {self.ano} é um carro")
 
-        
-        
+class Moto(Veiculo):
+    def mostrar_tipo(self):
+        print(f"{self.marca} {self.ano} é uma Moto")
+
+c1 = Carro("Fiat", 2020)
+m1 = Moto("Honda", 2022)
+
+c1.mostrar_tipo()
+m1.mostrar_tipo()
+'''
+
+class Funcionario:
+    def __init__(self):
+    def trabalhar():
 
 
 
 
+class Estagiario(Funcionario):
+    def trabalho():
 
 
 
