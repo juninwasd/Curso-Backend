@@ -1,6 +1,76 @@
 from abc import ABC, abstractmethod
 import math
 
+class Executar_movimento(ABC):
+    @abstractmethod
+    def mover(self):
+        pass
+
+class Carro(Transporte):
+    def mover(self):
+        return "O carro anda pelas estradas"
+    
+class Aviao(Transporte):
+    def mover(self):
+        return "O avião voa pelos céus"
+    
+class Barco(Transporte):
+    def mover(self):
+        return "O barco navegas pelas entradas"
+    
+Transporte = [Carro(),Aviao(),Barco()]
+
+for t in Transporte:
+    print(t.mover())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+class Veiculo(ABC):
+    @abstractmethod
+    def abastecer(self):
+        pass
+
+class Carro(Veiculo):
+    def abastecer(self):
+        return "Carro abastece com Gasolina"
+
+
+class Caminhão(Veiculo):
+    def abastecer(self):
+        return "Caminhão abastece com diesel"
+        
+
+veiculos = [Carro(),Caminhão()]
+
+for n in veiculos:
+    print(n.abastecer())
+
+
+
+
+
+
+
 #
 class Forma(ABC):
     @abstractmethod
@@ -24,7 +94,7 @@ print (f"Area do Retangulo é igual a: {p1.Metodo_area(10, 10)}")
 p2 = Circulo()
 print (f"Area do circulo é igual a: {p2.Metodo_area(10)}")
 
-'''
+
 
 #
 class Funcionario(ABC):
@@ -38,17 +108,25 @@ class Assaláriado(Funcionario):
         self.salario = salario
     
     def calcular_pagamento(self):
-        return self.
+        return self.salario
      
     
 class Horista(Funcionario):
+    def __init__(self, valor_hora, horas_trabalhados):
+        self.valor_hora = valor_hora
+        self.horas_trabalhadas = horas_trabalhados
+    
     def calcular_pagamento(self):
-        return f"Seu salário sera de R$ 15 , durante 9  horas , que dará R$ 135"
+        return self.valor_hora * self.horas_trabalhadas
 
-funcionario = [Assaláriado(),Horista()]
 
-for r in funcionario:
-    print(r.calcular_pagamento())
+f1 = Assaláriado(3000)
+f2 = Horista(50, 160)
+
+print(f"Assalariado irá pagar {f1.calcular_pagamento()}")
+print(f"Horista irá pagar {f2.calcular_pagamento()}")
+
+
 
 #
 class Instrumento(ABC):
