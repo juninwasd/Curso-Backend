@@ -124,25 +124,149 @@ m1 = Moto("Honda", 2022)
 
 c1.mostrar_tipo()
 m1.mostrar_tipo()
-'''
+
 
 class Funcionario:
-    def __init__(self):
-    def trabalhar():
-
-
-
+    def trabalhar(self):
+        print(f"O funcionario esta trabalhando normalmento.")
 
 class Estagiario(Funcionario):
-    def trabalho():
+    def trabalhar(self):
+        print(f"\nO estagiario esta aprendendo enquanto trabalha.")
+
+f1 = Funcionario()
+e1 = Estagiario()
+
+f1.trabalhar()
+e1.trabalhar()
 
 
 
 
+class ContaCorrente:
+    def __init__(self,nome):
+        self._saldo = 0
+        self._nome = nome
+
+    def get_depositar(self,valor):
+        self._saldo += valor
+        print(f"Voçê depositou R$ {valor:.2f}.")
+    
+    def set_sacar_dinheiro(self,valor):
+        if valor <= self._saldo:
+            self._saldo -= valor
+            print(f"Voçê acabou de sacar R${valor:.2f}")
+        else:
+            print(f"Saldo insuficiente para realizar o saque")
+
+    def mostrar_saldo(self):
+        print(f"Saldo atual de {self._nome}: R${self._saldo:.2f}")
+
+conta = ContaCorrente("Júnio")
+conta.get_depositar(700)
+conta.set_sacar_dinheiro(200)
+conta.set_sacar_dinheiro(700)
+conta.mostrar_saldo()
+
+
+class Aluno:
+    def __init__(self,nome,nota):
+        self._nome = nome
+        self._nota = nota
+
+    def mostrar_nota(self):
+        print(f"{self._nome},sua nota foi {self._nota}")
+
+    def apenas(self):
+        if self._nota >= 0 and self._nota <= 10:
+            print("nota aceita")
+        else:
+            print("nota inexistente") 
+
+aluno = Aluno("Eduardo", -1)
+aluno2 = Aluno("Raissa", 1)
+aluno3 = Aluno("Júnio", 9)
+
+aluno.mostrar_nota()
+aluno.apenas()
+aluno3.mostrar_nota()
+aluno3.apenas()
+aluno2.mostrar_nota()
+aluno2.apenas()
 
 
 
+class Pessoa:
+    def __init__(self,nome,idade):
+        self.nome = nome
+        self.idade = idade
+        
+class Professor(Pessoa):
+    def __init__(self, nome, idade, materia):
+        super().__init__(nome, idade)    
+        self.materia = materia
+
+p1 = Professor("Carlos", 40 , "Matemática")
+print(p1.nome, p1.idade, p1.materia)
 
 
+class Veiculo:
+    def mover(self):
+        print("O Veículo está se movendo...")
+
+class Carro(Veiculo):
+    def mover(self):
+        print ("é um carro")
+
+class Bicicleta(Veiculo):
+    def mover(self):
+        print("é uma bicicleta")
+
+carro = Carro()
+bicicleta = Bicicleta()
+
+carro.mover()
+bicicleta.mover()
 
 
+class Usuario:
+    def __init__(self, senha):
+        self.__senha = senha
+    
+    def login(self, senha):
+        if senha == self.__senha:
+            print("Login realizado com sucesso!")
+        else:
+            print("Login incorreto")
+
+    def alterar_senha(self,antiga,nova):
+        if antiga == self.__senha:
+            self.__senha = nova
+            print("Senha alterada com sucesso!")
+        else:
+            print("Senha antiga incorreta")
+
+u1 = Usuario("1234")
+u1.login("1234")
+u1.alterar_senha("1234", "abcd")
+u1.login("abcd")            
+            
+
+
+class Animal:
+    def respirar(self):
+        print("O animal está respirando.")
+
+class Mamifero(Animal):
+    def amamentar(self):
+        print("O mamifero está amamentando.")
+    
+class Cachorro(Mamifero):
+    def latir(self):
+        print("O cachorro está latindo: Au au!")
+
+dog = Cachorro()
+dog.respirar()
+dog.amamentar()
+dog.latir()
+'''
