@@ -1,12 +1,54 @@
 from abc import ABC, abstractmethod
+import math
+
+#
+class Forma(ABC):
+    @abstractmethod
+    def Metodo_area(self):
+        pass
+
+class Retangulo(Forma):
+    def Metodo_area(self,base,altura):
+        self.base = base
+        self.altura = altura
+        return self.base*self.altura
+        
+class Circulo(Forma):
+    def Metodo_area(self,raio):
+        self.raio = raio
+        return math.pi*(self.raio^2)
+
+p1 = Retangulo()
+print (f"Area do Retangulo é igual a: {p1.Metodo_area(10, 10)}")
+
+p2 = Circulo()
+print (f"Area do circulo é igual a: {p2.Metodo_area(10)}")
+
+'''
+
+#
+class Funcionario(ABC):
+    @abstractmethod
+    def calcular_pagamento(self):
+        pass
 
 
+class Assaláriado(Funcionario):
+    def __init__(self, salario):
+        self.salario = salario
+    
+    def calcular_pagamento(self):
+        return self.
+     
+    
+class Horista(Funcionario):
+    def calcular_pagamento(self):
+        return f"Seu salário sera de R$ 15 , durante 9  horas , que dará R$ 135"
 
+funcionario = [Assaláriado(),Horista()]
 
-
-
-
-
+for r in funcionario:
+    print(r.calcular_pagamento())
 
 #
 class Instrumento(ABC):
@@ -72,3 +114,4 @@ animais = [Cachorro(),Gato(),Pato()]
 
 for animal in animais:
     print(animal.fazer_som())
+'''
