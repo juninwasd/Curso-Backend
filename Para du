@@ -42,6 +42,85 @@ class Agenda:
             for contato in self.contatos:
                 print("-", contato)
 
+# Sistema de Cadastro com OOP e Conjuntos
+
+class Pessoa:
+    def __init__(self, nome, cpf):
+        self.nome = nome
+        self.cpf = cpf
+
+    def __repr__(self):
+        return f"{self.nome} (CPF: {self.cpf})"
+
+    def __eq__(self, other):
+        return isinstance(other, Pessoa) and self.cpf == other.cpf
+
+    def __hash__(self):
+        return hash(self.cpf)  # para funcionar em conjuntos
+
+
+class Aluno(Pessoa):
+    def __init__(self, nome, cpf, matricula):
+        super().__init__(nome, cpf)
+        self.matricula = matricula
+
+    def __repr__(self):
+        return f"Aluno: {self.nome} (Matrícula: {self.matricula})"
+
+
+class Professor(Pessoa):
+    def __init__(self, nome, cpf, siape):
+        super().__init__(nome, cpf)
+        self.siape = siape
+
+    def __repr__(self):
+        return f"Professor: {self.nome} (SIAPE: {self.siape})"
+
+
+class Curso:
+    def __init__(self, nome, codigo):
+        self.nome = nome
+        self.codigo = codigo
+        self.alunos = set()
+        self.professores = set()
+
+    def adicionar_aluno(self, aluno):
+        self.alunos.add(aluno)
+
+    def adicionar_professor(self, professor):
+        self.professores.add(professor)
+
+    def __repr__(self):
+        return f"Curso: {self.nome} (Código: {self.codigo})"
+
+    def detalhes(self):
+        return (f"\n--- {self.nome} ---\n"
+                f"Alunos: {[a.nome for a in self.alunos]}\n"
+                f"Professores: {[p.nome for p in self.professores]}")
+
+
+# ===== Exemplo de uso =====
+
+# Criando alunos
+a1 = Aluno("Ana", "111.111.111-11", "2025001")
+a2 = Aluno("Carlos", "222.222.222-22", "2025002")
+
+# Criando professores
+p1 = Professor("Marcos", "333.333.333-33", "9999")
+p2 = Professor("Julia", "444.444.444-44", "8888")
+
+# Criando curso
+c1 = Curso("Programação Orientada a Objetos", "POO101")
+
+# Adicionando alunos e professores ao curso
+c1.adicionar_aluno(a1)
+c1.adicionar_aluno(a2)
+c1.adicionar_professor(p1)
+c1.adicionar_professor(p2)
+
+# Mostrar detalhes do curso
+print(c1.detalhes())
+
 
 # ========== Exemplo de uso ==========
 if __name__ == "__main__":
