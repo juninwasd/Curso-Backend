@@ -1,0 +1,68 @@
+class Contato:
+    def __init__(self, nome, telefone, email=""):
+        self.nome = nome
+        self.telefone = telefone
+        self.email = email
+
+    def __repr__(self):
+        return f"{self.nome} - {self.telefone} ({self.email})"
+
+
+class Agenda:
+    def __init__(self):
+        self.contatos = []
+
+    def adicionar_contato(self, contato):
+        # Evitar duplicados pelo nome
+        if any(c.nome == contato.nome for c in self.contatos):
+            print(f"⚠️ Contato '{contato.nome}' já existe!")
+        else:
+            self.contatos.append(contato)
+            print(f"✅ Contato '{contato.nome}' adicionado com sucesso!")
+
+    def remover_contato(self, nome):
+        for contato in self.contatos:
+            if contato.nome == nome:
+                self.contatos.remove(contato)
+                print(f"🗑️ Contato '{nome}' removido.")
+                return
+        print(f"⚠️ Contato '{nome}' não encontrado.")
+
+    def buscar_contato(self, nome):
+        for contato in self.contatos:
+            if contato.nome.lower() == nome.lower():
+                return contato
+        return None
+
+    def listar_contatos(self):
+        if not self.contatos:
+            print("📭 Agenda vazia.")
+        else:
+            print("\n📒 Contatos na agenda:")
+            for contato in self.contatos:
+                print("-", contato)
+
+
+# ========== Exemplo de uso ==========
+if __name__ == "__main__":
+    agenda = Agenda()
+
+    # Criando contatos
+    c1 = Contato("Ana", "1111-1111", "ana@email.com")
+    c2 = Contato("Carlos", "2222-2222")
+
+    # Adicionando
+    agenda.adicionar_contato(c1)
+    agenda.adicionar_contato(c2)
+    agenda.adicionar_contato(c1)  # teste duplicado
+
+    # Listando
+    agenda.listar_contatos()
+
+    # Buscando
+    achado = agenda.buscar_contato("Ana")
+    print("\n🔎 Busca:", achado)
+
+    # Removendo
+    agenda.remover_contato("Carlos")
+    agenda.listar_contatos()
