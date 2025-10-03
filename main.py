@@ -26,4 +26,12 @@ while True:
 
     elif opcao == 2:
         nome_aluno = input("Nome do aluno: ")
-        curso = Curso(nome)
+        aluno = Aluno(nome_aluno)
+        alunos.add(aluno)
+        print(f"Aluno '{nome_aluno}' cadastro com sucesso!")
+
+    elif opcao == 3:
+        nome_professor = input("Nome do professor: ")
+        professor = Professor(nome_professor)
+        Professores.add(professor)
+        print(f"Professor '{nome_professor}' cadastro com sucesso!")
