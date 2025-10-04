@@ -34,4 +34,5 @@ while True:
         nome_professor = input("Nome do professor: ")
         professor = Professor(nome_professor)
         Professores.add(professor)
+
         print(f"Professor '{nome_professor}' cadastro com sucesso!")
