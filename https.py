@@ -105,11 +105,11 @@ print("\nStatus Code:\n", resposta.status_code)
 print("\nCorpo da resposta:\n", resposta.json())
 '''
 
-url = "https://httpbin.org/get"
+url =("https://pokeapi.co/api/v2/pokemon?limit=20000")
+response = requests.get(url)
+data = response.json()
 
-resposta = requests.options(url)
-
-print("\nStatus Code:\n", resposta.status_code)
-print("\nMetodos permitidos:\n", resposta.headers.get("Allow"))
-print("\nTodos os headers:\n", resposta.headers)
+print(f"Total Pokémon: {len(data['results'])}")
+for i, pokemon in enumerate(data['results'], start=1):
+    print(f"{i}. {pokemon['name']}")
 
