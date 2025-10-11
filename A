@@ -1,0 +1,25 @@
+Sub SalvarCadastro()
+
+    Dim wsForm As Worksheet
+    Dim wsCad As Worksheet
+    Dim linha As Long
+
+    ' Define as planilhas
+    Set wsForm = ThisWorkbook.Sheets("Formulário")
+    Set wsCad = ThisWorkbook.Sheets("Cadastro")
+
+    ' Acha a próxima linha vazia
+    linha = wsCad.Cells(wsCad.Rows.Count, "A").End(xlUp).Row + 1
+
+    ' Copia os dados do formulário
+    wsCad.Cells(linha, 1).Value = wsForm.Range("B2").Value ' Nome
+    wsCad.Cells(linha, 2).Value = wsForm.Range("B3").Value ' Idade
+    wsCad.Cells(linha, 3).Value = wsForm.Range("B4").Value ' CPF
+    wsCad.Cells(linha, 4).Value = wsForm.Range("B5").Value ' Endereço
+
+    ' Limpa o formulário
+    wsForm.Range("B2:B5").ClearContents
+
+    MsgBox "Cadastro salvo com sucesso!", vbInformation
+
+End Sub
