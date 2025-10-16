@@ -1,25 +1,23 @@
-Sub SalvarCadastro()
+from pathlib import Path
+from flask import Flask, render_template
+from flask_sqlalchemy import SQLAlchemy
 
-    Dim wsForm As Worksheet
-    Dim wsCad As Worksheet
-    Dim linha As Long
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tarefas.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-    ' Define as planilhas
-    Set wsForm = ThisWorkbook.Sheets("Formulário")
-    Set wsCad = ThisWorkbook.Sheets("Cadastro")
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(100), nullable=False)
+    concluida = db.Column(db.Boolean, default=False)
 
-    ' Acha a próxima linha vazia
-    linha = wsCad.Cells(wsCad.Rows.Count, "A").End(xlUp).Row + 1
+@app.route('/')
+def index():
+    tarefas = Task.query.all()
+    return render_template('index.html', tarefas=tarefas)
 
-    ' Copia os dados do formulário
-    wsCad.Cells(linha, 1).Value = wsForm.Range("B2").Value ' Nome
-    wsCad.Cells(linha, 2).Value = wsForm.Range("B3").Value ' Idade
-    wsCad.Cells(linha, 3).Value = wsForm.Range("B4").Value ' CPF
-    wsCad.Cells(linha, 4).Value = wsForm.Range("B5").Value ' Endereço
-
-    ' Limpa o formulário
-    wsForm.Range("B2:B5").ClearContents
-
-    MsgBox "Cadastro salvo com sucesso!", vbInformation
-
-End Sub
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+    app.run(debug=True)
