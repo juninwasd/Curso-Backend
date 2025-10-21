@@ -38,13 +38,74 @@ cursor.execute('''
     estoque TEXT UNIQUE NOT NULL
     )
         ''')
+import sqlite3
 
-cursor.execute("INSERT INTO usuarios (nome,preco,estoque) VALUES (?,?,?)", ("feijao", 20, 10))
-cursor.execute("INSERT INTO usuarios (nome,preco,estoque) VALUES (?,?,?)", ("macarrao", 15, 15))
-cursor.execute("INSERT INTO usuarios (nome,preco,estoque) VALUES (?,?,?)", ("carne", 30, 20))
+def criar banco():
+
+conexao sqlite3.connect("loja.db")
+
+cursor conexao.cursor()
+
+cursor.execute(
+
+CREATE TABLE IF NOT EXISTS produtos (
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+nome TEXT NOT NULL,
+
+preco REAL NOT NULL,
+
+estoque INTEGER NOT NULL
 
 conexao.commit()
+
 conexao.close()
 
-if __name__ == "__main__":
-    app.run(debug=True)
+def inserir_produtos():
+
+conexao sqlite3.connect("loja.db')
+
+cursor conexao.cursor()
+
+produtos = [
+
+("Camiseta", 49.90, 28),
+
+("Bone", 29.90, 15),
+
+("Tênis", 199.00, 10)
+
+cursor.executemany (INSERT INTO produtos (nome, preco, estoque) VALUES (?, ?, ?)', produtos)
+
+conexao.commit()
+
+conexao.close()
+
+def listar produtos():
+
+conexao sqlite3.connect('loja.db")
+
+cursor conexao.cursor()
+
+cursor.execute("SELECT FROM produtos")
+
+produtos cursor.fetchall()
+
+print("\n Lista de produtos cadastrados:")
+
+print(48)
+
+for produto in produtos:
+
+print("ID: (produto[0]) | Nome: (produto[1]) | Preço: RS (produto[2]:.24] | Estoque: (produto[3]}")
+
+print(40)
+
+conexao.close() #Execução do fluxo completo.
+
+criar_banco()
+
+inserir produtos()
+
+listar produtos()
