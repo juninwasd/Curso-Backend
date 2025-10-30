@@ -1,3 +1,4 @@
+import json
 from flask_login import login_required
 from app import app, db                    # 1) app e db primeiro
 import auth                               # 2) login manager
@@ -19,6 +20,8 @@ from flask import jsonify, make_response, send_file
 from xml.etree.ElementTree import Element, SubElement, tostring, ElementTree
 from models import Cliente, Produto, Categoria, Fornecedor, Pedido, ItemPedido, Arquivo
 from flask import request, redirect, url_for, render_template, flash, jsonify, make_response, send_file, abort
+from flask_login import login_required
+from auth import role_required
 
 # >>> MENU PRINCIPAL <<<
 @app.route("/", methods=["GET"])
@@ -37,7 +40,7 @@ def listar_clientes():
     return render_template("clientes.html", clientes=clientes)
 
 @app.route("/clientes", methods=["POST"])
-@login_required
+@role_required("admin", "operador") 
 def cadastrar_cliente():
     nome = request.form.get("nome")
     email = request.form.get("email") or None
@@ -49,13 +52,13 @@ def cadastrar_cliente():
     return redirect(url_for("listar_clientes"))
 
 @app.route("/clientes/editar/<int:id>", methods=["GET"])
-@login_required
+@role_required("admin", "operador") 
 def form_editar_cliente(id):
     cliente = Cliente.query.get_or_404(id)
     return render_template("clientes_editar.html", cliente=cliente)
 
 @app.route("/clientes/editar/<int:id>", methods=["POST"])
-@login_required
+@role_required("admin", "operador") 
 def editar_cliente(id):
     cliente = Cliente.query.get_or_404(id)
     nome = request.form.get("nome")
@@ -88,7 +91,7 @@ def listar_produtos():
     return render_template("produtos.html", produtos=produtos, categorias=categorias)
 
 @app.route("/produtos", methods=["POST"])
-@login_required
+@role_required("admin", "operador") 
 def cadastrar_produto():
     nome = request.form.get("nome")
     preco = request.form.get("preco", type=float)
@@ -111,14 +114,14 @@ def cadastrar_produto():
     return redirect(url_for("listar_produtos"))
 
 @app.route("/produtos/editar/<int:id>", methods=["GET"])
-@login_required
+@role_required("admin", "operador")     
 def form_editar_produto(id):
     produto = Produto.query.get_or_404(id)
     categorias = Categoria.query.order_by(Categoria.nome.asc()).all()
     return render_template("produtos_editar.html", produto=produto, categorias=categorias)
 
 @app.route("/produtos/editar/<int:id>", methods=["POST"])
-@login_required
+@role_required("admin", "operador") 
 def editar_produto(id):
     produto = Produto.query.get_or_404(id)
     nome = request.form.get("nome")
@@ -173,7 +176,7 @@ def listar_arquivos():
     return render_template("arquivos.html", arquivos=arquivos)
 
 @app.route("/uploads", methods=["POST"])
-@login_required
+@role_required("admin", "operador") 
 def enviar_arquivos():
     """
     Form espera input name="files" multiple
@@ -244,7 +247,7 @@ def download_arquivo(id):
     )
 
 @app.route("/uploads/excluir/<int:id>", methods=["POST"])
-@login_required
+@role_required("admin", "operador") 
 def excluir_arquivo(id):
     arq = Arquivo.query.get_or_404(id)
     try:
@@ -264,6 +267,7 @@ def excluir_arquivo(id):
 from werkzeug.exceptions import RequestEntityTooLarge
 
 @app.errorhandler(RequestEntityTooLarge)
+@login_required
 def handle_large_file(e):
     flash("Arquivo(s) muito grande(s). Limite de 10MB por envio.", "error")
     return redirect(url_for("listar_arquivos"))
@@ -271,12 +275,8 @@ def handle_large_file(e):
 # ----------------------------
 # Pedidos - listagem simples
 # ----------------------------
-
-   ####----- essa linha deve ser adicionada, sempre abaixo da @app.route
-
-
 @app.route("/pedidos", methods=["GET"])
-
+@login_required
 def listar_pedidos():
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
     return render_template("pedidos.html", pedidos=pedidos)
@@ -285,13 +285,14 @@ def listar_pedidos():
 # Vendas - formulário e gravação
 # ----------------------------
 @app.route("/vendas/nova", methods=["GET"])
-
+@login_required
 def form_venda():
     clientes = Cliente.query.order_by(Cliente.nome.asc()).all()
     produtos = Produto.query.order_by(Produto.nome.asc()).all()
     return render_template("vendas_nova.html", clientes=clientes, produtos=produtos)
 
 @app.route("/vendas/nova", methods=["POST"])
+@role_required("admin", "operador") 
 def criar_venda():
     """
     Espera:
@@ -354,22 +355,24 @@ def criar_venda():
         db.session.rollback()
         flash(f"Erro ao registrar venda: {e}", "error")
         return redirect(url_for("form_venda"))
-    def parse_date(dstr: str | None):
+def parse_date(dstr: str | None):
       if not dstr:
         return None
     # aceita formatos DD/MM/AAAA ou AAAA-MM-DD (value padrão <input type="date">)
-    for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+      for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
         try:
             return datetime.strptime(dstr, fmt)
         except ValueError:
             continue
-    return None
+            return None
 
 @app.route("/relatorios", methods=["GET"])
+@login_required
 def relatorios_form():
     return render_template("relatorios.html")
 
 @app.route("/relatorios/pedidos", methods=["POST"])
+@role_required("admin", "operador") 
 def relatorio_pedidos_html():
     inicio = parse_date(request.form.get("inicio"))
     fim = parse_date(request.form.get("fim"))
@@ -386,6 +389,7 @@ def relatorio_pedidos_html():
     return render_template("relatorios_pedidos.html", pedidos=pedidos, total_geral=total_geral, inicio=inicio, fim=fim)
 
 @app.route("/relatorios/pedidos.csv", methods=["GET"])
+@login_required
 def relatorio_pedidos_csv():
     # CSV leve: id, cliente, status, total
     pedidos = Pedido.query.order_by(Pedido.id.desc()).all()
@@ -400,6 +404,7 @@ def relatorio_pedidos_csv():
     return resp
 
 @app.route("/relatorios/produtos.csv", methods=["GET"])
+@login_required
 def relatorio_produtos_csv():
     produtos = Produto.query.order_by(Produto.id.desc()).all()
     buf = io.StringIO(newline="")
@@ -413,6 +418,7 @@ def relatorio_produtos_csv():
     return resp
 
 @app.route("/relatorios/clientes.csv", methods=["GET"])
+@login_required
 def relatorio_clientes_csv():
     clientes = Cliente.query.order_by(Cliente.id.desc()).all()
     buf = io.StringIO(newline="")
@@ -441,6 +447,7 @@ def produtos_to_xml(produtos):
     return tostring(root, encoding="utf-8")
 
 @app.route("/xml/produtos", methods=["GET"])
+@login_required
 def exportar_produtos_xml():
     produtos = Produto.query.order_by(Produto.id.asc()).all()
     xml_bytes = produtos_to_xml(produtos)
@@ -450,6 +457,7 @@ def exportar_produtos_xml():
     return resp
 
 @app.route("/xml/importar", methods=["POST"])
+@role_required("admin", "operador") 
 def importar_produtos_xml():
     """
     Espera um arquivo XML no input name="arquivo".
@@ -506,6 +514,7 @@ def importar_produtos_xml():
 # ===========================
 
 @app.route("/api/produtos", methods=["GET"])
+@login_required
 def api_produtos():
     produtos = Produto.query.order_by(Produto.id.asc()).all()
     data = [
@@ -521,12 +530,14 @@ def api_produtos():
     return jsonify(data)
 
 @app.route("/api/clientes", methods=["GET"])
+@login_required
 def api_clientes():
     clientes = Cliente.query.order_by(Cliente.id.asc()).all()
     data = [{"id": c.id, "nome": c.nome, "email": c.email, "ativo": c.ativo} for c in clientes]
     return jsonify(data)
 
 @app.route("/api/pedidos", methods=["GET"])
+@login_required
 def api_pedidos():
     pedidos = Pedido.query.order_by(Pedido.id.asc()).all()
     data = []
@@ -550,6 +561,7 @@ def api_pedidos():
     return jsonify(data)
 
 @app.route("/json/importar", methods=["POST"])
+@role_required("admin", "operador") 
 def importar_produtos_json():
     """
     Espera JSON no body ou arquivo com input name="arquivo".
@@ -605,6 +617,7 @@ def importar_produtos_json():
 # EXCLUSÕES (DELETE) COM REGRAS
 # ===========================
 @app.route("/clientes/excluir/<int:id>", methods=["POST"])
+@role_required("admin", "operador") 
 def excluir_cliente(id):
     cliente = Cliente.query.get_or_404(id)
     # bloqueia se cliente tiver pedidos
@@ -622,6 +635,7 @@ def excluir_cliente(id):
     return redirect(url_for("listar_clientes"))
 
 @app.route("/produtos/excluir/<int:id>", methods=["POST"])
+@role_required("admin", "operador") 
 def excluir_produto(id):
     produto = Produto.query.get_or_404(id)
     # bloqueia se produto estiver em itens de pedido
@@ -639,6 +653,7 @@ def excluir_produto(id):
     return redirect(url_for("listar_produtos"))
 
 @app.route("/pedidos/excluir/<int:id>", methods=["POST"])
+@role_required("admin", "operador") 
 def excluir_pedido(id):
     pedido = Pedido.query.get_or_404(id)
     try:
