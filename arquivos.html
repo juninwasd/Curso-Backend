@@ -1,7 +1,6 @@
-# templates/arquivos.html — formulário + tabela de arquivos
-# Crie este novo template.
 {% extends "base.html" %}
 {% block content %}
+{% if current_user.has_role('admin') or current_user.has_role('operador') %}
   <h1 class="page-title">Arquivos (Upload)</h1>
 
   <form class="form" method="post" action="{{ url_for('enviar_arquivos') }}" enctype="multipart/form-data">
@@ -39,5 +38,6 @@
     </tbody>
   </table>
 {% endblock %}
+{% endif %}
 
 
