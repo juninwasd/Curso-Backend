@@ -15,8 +15,9 @@
     <a href="{{ url_for('form_venda') }}">Nova Venda</a>
     <a href="{{ url_for('listar_pedidos') }}">Pedidos</a>
     <a href="{{ url_for('listar_arquivos') }}">Arquivos</a> 
+    <a href="{{ url_for('relatorios_form') }}">Relatórios</a>
   </div>
-</nav>
+  </nav>
 
   <main class="container">
     {% with messages = get_flashed_messages(with_categories=True) %}
@@ -35,10 +36,27 @@
   <footer class="footer">
     Flask • SQLAlchemy • PostgreSQL
   </footer>
+
+  <nav class="navbar">
+  <a class="brand" href="{{ url_for('home') }}">Módulo 12</a>
+  <div class="links">
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('listar_clientes') }}">Clientes</a>
+      <a href="{{ url_for('listar_produtos') }}">Produtos</a>
+      <a href="{{ url_for('listar_pedidos') }}">Pedidos</a>
+      <a href="{{ url_for('relatorios_form') }}">Relatórios</a>
+    {% endif %}
+    
+      {% if current_user.has_role('admin') %}
+        <a href="{{ url_for('admin.index') }}">Admin</a>
+      {% endif %}
+      <a href="{{ url_for('logout') }}">Sair</a>
+    {% else %}
+      <a href="{{ url_for('login') }}">Entrar</a>
+    {% endif %}
+  </div>
+  </nav>
+
+
 </body>
 </html>
-
-# templates/base.html — link no menu
-# Adicione Arquivos na navbar:
-
-

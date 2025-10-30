@@ -5,6 +5,9 @@ from models import User, Role
 from functools import wraps
 from flask_login import current_user
 from flask import redirect, url_for, flash
+from functools import wraps
+from flask_login import current_user
+from flask import redirect, url_for, flash
 
 
 login_manager = LoginManager(app)
@@ -33,3 +36,25 @@ def logout():
     logout_user()
     flash("Sessão encerrada.", "success")
     return redirect(url_for("login"))
+
+
+def role_required(*roles):
+    """
+    Ex.: @role_required("admin") ou @role_required("admin", "operador")
+    """
+    def deco(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            if not current_user.is_authenticated:
+                flash("Faça login para continuar.", "error")
+                return redirect(url_for("login"))
+            if "admin" in roles and hasattr(current_user, "has_role") and current_user.has_role("admin"):
+                return fn(*args, **kwargs)
+            # qualquer outro papel listado
+            for r in roles:
+                if hasattr(current_user, "has_role") and current_user.has_role(r):
+                    return fn(*args, **kwargs)
+            flash("Você não tem permissão para acessar esta página.", "error")
+            return redirect(url_for("home"))
+        return wrapper
+    return deco
