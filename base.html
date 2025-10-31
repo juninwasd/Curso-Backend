@@ -18,6 +18,7 @@
         <a href="{{ url_for('listar_pedidos') }}">Pedidos</a>
         <a href="{{ url_for('listar_arquivos') }}">Arquivos</a>
         <a href="{{ url_for('relatorios_form') }}">Relatórios</a>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
 
         {% if current_user.has_role('admin') %}
           <a href="{{ url_for('admin.index') }}">Admin</a>
