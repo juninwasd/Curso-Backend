@@ -1,27 +1,24 @@
 import json
-from flask_login import login_required
-from app import app, db                    # 1) app e db primeiro
-import auth                               # 2) login manager
 import admin                               # 3) painel admin (usa auth)
-from decimal import Decimal
-from flask import request, redirect, url_for, render_template, flash
-from app import app, db
-from sqlalchemy import func
 import os
 import uuid
-from pathlib import Path
-from werkzeug.utils import secure_filename
-from flask import send_from_directory, abort
-from app import app, db
 import csv
 import io
 from datetime import datetime
-from flask import jsonify, make_response, send_file
 from xml.etree.ElementTree import Element, SubElement, tostring, ElementTree
 from models import Cliente, Produto, Categoria, Fornecedor, Pedido, ItemPedido, Arquivo
-from flask import request, redirect, url_for, render_template, flash, jsonify, make_response, send_file, abort
+from flask import request, redirect, url_for, render_template, flash, jsonify, make_response, send_file, abort, send_from_directory
 from flask_login import login_required
 from auth import role_required
+from datetime import datetime, timedelta
+from sqlalchemy import func
+from flask_login import login_required, current_user
+from pathlib import Path
+from werkzeug.utils import secure_filename
+from app import app, db
+from decimal import Decimal
+from sqlalchemy import func
+
 
 # >>> MENU PRINCIPAL <<<
 @app.route("/", methods=["GET"])
@@ -58,7 +55,7 @@ def form_editar_cliente(id):
     return render_template("clientes_editar.html", cliente=cliente)
 
 @app.route("/clientes/editar/<int:id>", methods=["POST"])
-@role_required("admin", "operador") 
+@login_required
 def editar_cliente(id):
     cliente = Cliente.query.get_or_404(id)
     nome = request.form.get("nome")
@@ -356,15 +353,15 @@ def criar_venda():
         flash(f"Erro ao registrar venda: {e}", "error")
         return redirect(url_for("form_venda"))
 def parse_date(dstr: str | None):
-      if not dstr:
+    if not dstr:
         return None
-    # aceita formatos DD/MM/AAAA ou AAAA-MM-DD (value padrão <input type="date">)
-      for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d"):
         try:
             return datetime.strptime(dstr, fmt)
         except ValueError:
             continue
-            return None
+    return None
+
 
 @app.route("/relatorios", methods=["GET"])
 @login_required
@@ -666,9 +663,85 @@ def excluir_pedido(id):
     return redirect(url_for("listar_pedidos"))
 
 
-if __name__ == "__main__":
-    # Executa servidor para testar as rotas
-    
-    app.run(host= '0.0.0.0', port=5000)
+def _dt_range_from_query():
+    """
+    Aceita ?inicio=YYYY-MM-DD&fim=YYYY-MM-DD (ou DD/MM/YYYY).
+    Fallback: últimos 7 dias.
+    """
+    def parse_date(s):
+        if not s:
+            return None
+        for fmt in ("%Y-%m-%d", "%d/%m/%Y"):
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                pass
+        return None
 
-    app.run(debug=True)
+    inicio = parse_date(request.args.get("inicio"))
+    fim = parse_date(request.args.get("fim"))
+    if not inicio and not fim:
+        fim = datetime.utcnow()
+        inicio = fim - timedelta(days=6)
+    if inicio and not fim:
+        fim = datetime.utcnow()
+    if fim:
+        fim = fim.replace(hour=23, minute=59, second=59, microsecond=999999)
+    return inicio, fim
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    inicio, fim = _dt_range_from_query()
+
+    # Totais básicos
+    total_clientes = db.session.query(func.count(Cliente.id)).scalar() or 0
+    total_produtos = db.session.query(func.count(Produto.id)).scalar() or 0
+    estoque_total = db.session.query(func.coalesce(func.sum(Produto.estoque), 0)).scalar() or 0
+
+    # Pedidos no período
+    q_pedidos = Pedido.query
+    if inicio:
+        q_pedidos = q_pedidos.filter(Pedido.data_criacao >= inicio)
+    if fim:
+        q_pedidos = q_pedidos.filter(Pedido.data_criacao <= fim)
+
+    pedidos_periodo = q_pedidos.count()
+    faturamento_periodo = db.session.query(
+        func.coalesce(func.sum(Pedido.valor_total), 0)
+    ).filter(
+        (Pedido.data_criacao >= inicio) if inicio else True,
+        (Pedido.data_criacao <= fim) if fim else True
+    ).scalar()
+
+    # Últimos pedidos (independente do filtro, para visão rápida)
+    ultimos = Pedido.query.order_by(Pedido.data_criacao.desc()).limit(8).all()
+
+    # Top categorias por faturamento no período (opcional, aparece se houver dados)
+    top_cat = db.session.query(
+        Categoria.nome.label("categoria"),
+        func.coalesce(func.sum(ItemPedido.quantidade * ItemPedido.preco_unitario), 0).label("total")
+    ).join(Produto, Produto.categoria_id == Categoria.id
+    ).join(ItemPedido, ItemPedido.produto_id == Produto.id
+    ).join(Pedido, Pedido.id == ItemPedido.pedido_id
+    ).filter(
+        (Pedido.data_criacao >= inicio) if inicio else True,
+        (Pedido.data_criacao <= fim) if fim else True
+    ).group_by(Categoria.nome
+    ).order_by(func.sum(ItemPedido.quantidade * ItemPedido.preco_unitario).desc()
+    ).limit(5).all()
+
+    return render_template(
+        "dashboard.html",
+        inicio=inicio, fim=fim,
+        total_clientes=total_clientes,
+        total_produtos=total_produtos,
+        estoque_total=estoque_total,
+        pedidos_periodo=pedidos_periodo,
+        faturamento_periodo=float(faturamento_periodo or 0),
+        ultimos=ultimos,
+        top_cat=top_cat,
+    )
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
