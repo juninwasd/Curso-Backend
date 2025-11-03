@@ -6,7 +6,7 @@ import csv
 import io
 from datetime import datetime
 from xml.etree.ElementTree import Element, SubElement, tostring, ElementTree
-from models import Cliente, Produto, Categoria, Fornecedor, Pedido, ItemPedido, Arquivo
+from models import Cliente, Produto, Categoria, Fornecedor, Pedido, ItemPedido, Arquivo, AuditLog
 from flask import request, redirect, url_for, render_template, flash, jsonify, make_response, send_file, abort, send_from_directory
 from flask_login import login_required
 from auth import role_required
@@ -18,12 +18,19 @@ from werkzeug.utils import secure_filename
 from app import app, db
 from decimal import Decimal
 from sqlalchemy import func
-
+import audit
+ 
+@app.before_request
+def attach_user_to_session():
+    db.session.info["user_id"] = current_user.id if getattr(current_user, "is_authenticated", False) else None
+    db.session.info["ip"] = request.headers.get("X-Forwarded-For", request.remote_addr)
 
 # >>> MENU PRINCIPAL <<<
 @app.route("/", methods=["GET"])
 @login_required
 def home():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
     return render_template("index.html")
 
 # ----------------------------
@@ -743,5 +750,24 @@ def dashboard():
         top_cat=top_cat,
     )
 
+@app.route("/auditoria")
+@role_required("admin")
+def auditoria_list():
+    # filtros simples por querystring
+    entidade = request.args.get("entidade")
+    usuario = request.args.get("usuario", type=int)
+    pagina = request.args.get("page", 1, type=int)
+    por_pagina = 20
+
+    q = AuditLog.query.order_by(AuditLog.created_at.desc())
+    if entidade:
+        q = q.filter(AuditLog.entity == entidade)
+    if usuario is not None:
+        q = q.filter(AuditLog.user_id == usuario)
+
+    pag = q.paginate(page=pagina, per_page=por_pagina, error_out=False)
+    return render_template("auditoria.html", pag=pag, registros=pag.items,
+                           entidade=entidade, usuario=usuario)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(ssl_context="adhoc", host='localhost', debug=True)
